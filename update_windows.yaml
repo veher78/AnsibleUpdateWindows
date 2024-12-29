@@ -2,8 +2,12 @@
   hosts: windows
   gather_facts: yes
   tasks:
-    - name: Install Windows updates
-      win_service_facts:
+    - name: Install pending Windows updates
+      win_updates:
+        category_names:
+          - SecurityUpdates
+          - CriticalUpdates
+        reboot: yes  # Automatically reboot if required
 
     - name: Check if a reboot is required based on registry keys
       win_shell: |
@@ -23,3 +27,4 @@
         wait: yes
         msg: "Rebooting to complete update"
       when: reboot_needed.stdout == "True"
+      

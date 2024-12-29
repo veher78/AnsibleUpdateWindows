@@ -1,32 +1,13 @@
+
 - name: Update Windows Server and Reboot if Needed
   hosts: windows
   gather_facts: yes
   vars:
-    ansible_python_interpreter: ~/.local/pipx/venvs/pywinrm/bin/python  # Path to the Python executable installed by pipx
+    ansible_python_interpreter: ~/.local/pipx/venvs/pywinrm/bin/python  # Path to Python executable in pipx
   tasks:
     - name: Install pending Windows updates
       win_updates:
         category_names:
           - SecurityUpdates
           - CriticalUpdates
-        reboot: yes  # Automatically reboot if required
-
-    - name: Check if a reboot is required based on registry keys
-      win_shell: |
-        $rebootRequired = $false
-        if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired") {
-          $rebootRequired = $true
-        }
-        if (Test-Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations") {
-          $rebootRequired = $true
-        }
-        return $rebootRequired
-      register: reboot_needed
-
-    - name: Reboot the system if required
-      win_reboot:
-        reboot_timeout: 600
-        wait: yes
-        msg: "Rebooting to complete update"
-      when: reboot_needed.stdout == "True"
-      
+        reboot: yes
